@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Form, Button, ListGroup, Badge } from 'react-bootstrap'
 
 interface Todo {
@@ -7,9 +7,18 @@ interface Todo {
   completed: boolean
 }
 
+const STORAGE_KEY = 'todos'
+
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) : []
+  })
   const [inputValue, setInputValue] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
+  }, [todos])
 
   const addTodo = () => {
     if (inputValue.trim()) {
@@ -74,7 +83,7 @@ function App() {
                     <ListGroup.Item
                       key={todo.id}
                       className="d-flex justify-content-between align-items-center"
-                    >
+                    > 
                       <div className="d-flex align-items-center">
                         <Form.Check
                           type="checkbox"
@@ -84,7 +93,7 @@ function App() {
                         />
                         <span
                           className={todo.completed ? 'text-decoration-line-through text-muted' : ''}
-                        >
+                        > 
                           {todo.text}
                         </span>
                       </div>
@@ -96,7 +105,7 @@ function App() {
                           variant="outline-danger"
                           size="sm"
                           onClick={() => deleteTodo(todo.id)}
-                        >
+                        > 
                           Delete
                         </Button>
                       </div>
